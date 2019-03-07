@@ -1,5 +1,26 @@
 {
-  "users": [{
-    "name": "Andre"
-  }]
+  "rabobank": {
+    "name": "Rabobank",
+    "location": "Utrecht",
+    "project": "Cool Project",
+    "department": "Platform"
+  },
+  "developers": [
+    {
+      "name": "John",
+      "rating": 0
+    },
+    {
+      "name": "Marie",
+      "rating": 0
+    },
+    {
+      "name": "Julie",
+      "rating": 0
+    },
+    {
+      "name": "Mario",
+      "rating": 0
+    }
+  ]
 }
