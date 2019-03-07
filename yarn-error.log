@@ -1,0 +1,36 @@
+Arguments: 
+  /Users/andreluisasantos/.nvm/versions/node/v10.4.1/bin/node /Users/andreluisasantos/.yarn/bin/yarn.js init
+
+PATH: 
+  /Users/andreluisasantos/.yarn/bin:/Users/andreluisasantos/.config/yarn/global/node_modules/.bin:/Users/andreluisasantos/Downloads/google-cloud-sdk/bin:/Users/andreluisasantos/.nvm/versions/node/v10.4.1/bin:/Users/andreluisasantos/.cargo/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/andreluisasantos/workspace/pp/go/bin:/Users/andreluisasantos/.nvm/versions/node/v10.4.1/bin:/Users/andreluisasantos/.local/bin:/Users/andreluisasantos/Library/Android/sdk/tools:/Users/andreluisasantos/Library/Android/sdk/build-tools:/Users/andreluisasantos/Library/Android/sdk/platform-tools
+
+Yarn version: 
+  1.10.1
+
+Node version: 
+  10.4.1
+
+Platform: 
+  darwin x64
+
+Trace: 
+  Error: canceled
+      at Interface.<anonymous> (/Users/andreluisasantos/.yarn/lib/cli.js:116426:13)
+      at Interface.emit (events.js:182:13)
+      at Interface._ttyWrite (readline.js:783:16)
+      at ReadStream.onkeypress (readline.js:168:10)
+      at ReadStream.emit (events.js:182:13)
+      at emitKeys (internal/readline.js:422:14)
+      at emitKeys.next (<anonymous>)
+      at ReadStream.onData (readline.js:1022:36)
+      at ReadStream.emit (events.js:182:13)
+      at addChunk (_stream_readable.js:283:12)
+
+npm manifest: 
+  No manifest
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
