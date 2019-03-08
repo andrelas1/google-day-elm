@@ -1,8 +1,9 @@
 module Main exposing (Model, Msg(..), init, main, update, view)
 
 import Browser
-import Html exposing (Html, div, h1, li, p, text, ul)
-import Html.Attributes exposing (class, id)
+import Html exposing (..)
+import Html.Attributes exposing (..)
+import Html.Events exposing (onSubmit)
 import Http
 import Json.Decode exposing (Decoder, field, list, map2, string)
 
@@ -65,6 +66,10 @@ type Msg
     | SendDevelopersFeedbackForm FormModel
 
 
+lietest fields =
+    fields
+
+
 
 -- View
 
@@ -76,12 +81,51 @@ view model =
             div [] [ p [] [ text "Error" ] ]
 
         Loading ->
-            div [] [ h1 [] [ text "Loading..." ] ]
+            div [ class "spinner-layer spinner-blue" ]
+                [ div [ class "circle-clipper left" ]
+                    [ div [ class "circle" ]
+                        []
+                    ]
+                , div [ class "gap-patch" ]
+                    [ div [ class "circle" ]
+                        []
+                    ]
+                , div [ class "circle-clipper right" ]
+                    [ div [ class "circle" ]
+                        []
+                    ]
+                ]
 
         StepOne companyData ->
-            div
-                [ class "bla bla1" ]
-                [ p [] [ text companyData.name ]
+            div [ class "container" ]
+                [ div [ class "row card-panel" ]
+                    [ Html.form [ class "col s12" ]
+                        [ h2 []
+                            [ text "Company Name" ]
+                        , div [ class "row" ]
+                            [ div [ class "input-field col s12" ]
+                                [ input [ class "validate", id "manager_name", type_ "text" ]
+                                    []
+                                , label [ for "manager_name" ]
+                                    [ text "Manager Name" ]
+                                ]
+                            ]
+                        , div [ class "row" ]
+                            [ div [ class "input-field col s12" ]
+                                [ input [ class "validate", id "location", type_ "text" ]
+                                    []
+                                , label [ for "location" ]
+                                    [ text "Location" ]
+                                ]
+                            ]
+                        , button
+                            [ class "btn waves-effect waves-light", name "action", type_ "submit" ]
+                            [ text "Submit    "
+                            , i [ class "material-icons right" ]
+                                [ text "send" ]
+                            ]
+                        ]
+                    ]
                 ]
 
         StepTwo developersList ->
