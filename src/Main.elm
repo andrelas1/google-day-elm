@@ -50,7 +50,7 @@ type Model
     = Failure
     | Loading
     | StepOne CompanyInformationForm
-    | StepTwo (List Developer)
+    | StepTwo DeveloperFeedbackForm
     | ThankYou
 
 
@@ -59,10 +59,6 @@ type alias DevelopersListModel =
         { name : String
         , rating : Int
         }
-
-
-type alias FormModel =
-    { developersFeedback : DevelopersListModel }
 
 
 type Msg
@@ -161,11 +157,43 @@ stepOneView model =
         ]
 
 
-developersListView : List String -> Html msg
-developersListView list =
-    list
-        |> List.map (\user -> li [] [ text user ])
-        |> ul []
+renderDeveloper : DeveloperFeedback -> Html Msg
+renderDeveloper model =
+    div [ class "row" ]
+        [ div [ class "row" ]
+            [ h2 []
+                [ text model.name ]
+            ]
+        , div [ class "row" ]
+            [ div [ class "input-field col s6" ]
+                [ input [ class "validate", id "rating", type_ "number", value <| String.fromInt model.rating ]
+                    []
+                , label [ for "rating" ]
+                    [ text "Rating" ]
+                ]
+            , div [ class "input-field col s6" ]
+                [ textarea [ class "validate", id "comments", name "comments", value model.comments ]
+                    []
+                , label [ for "comments" ]
+                    [ text "Comments" ]
+                ]
+            ]
+        ]
+
+
+developerToDeveloperFeedback : String -> DeveloperFeedback
+developerToDeveloperFeedback model =
+    { name = model, comments = "", rating = 0 }
+
+
+developersListToDeveloperFeedbackForm : List String -> DeveloperFeedbackForm
+developersListToDeveloperFeedbackForm model =
+    List.map developerToDeveloperFeedback model
+
+
+developersListView : DeveloperFeedbackForm -> Html Msg
+developersListView model =
+    div [ class "container" ] (List.map renderDeveloper model)
 
 
 
@@ -245,13 +273,13 @@ update msg model =
         FetchDevelopersList result ->
             case result of
                 Ok data ->
-                    ( StepTwo data, Cmd.none )
+                    ( StepTwo [], Cmd.none )
 
                 Err _ ->
                     ( Failure, Cmd.none )
 
         SendCompanyDetails formModel ->
-            ( StepTwo [ "John", "Lucia" ], Cmd.none )
+            ( StepTwo [], Cmd.none )
 
         SendDevelopersFeedbackForm form ->
             ( model, Cmd.none )
