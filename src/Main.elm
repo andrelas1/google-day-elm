@@ -3,8 +3,10 @@ module Main exposing (Model, Msg(..), init, main, update, view)
 import Browser
 import Html exposing (Html, div, h1, li, p, text, ul)
 import Html.Attributes exposing (class, id)
+import Html.Events exposing (onSubmit)
 import Http
 import Json.Decode exposing (Decoder, field, list, map2, string)
+import Json.Encode
 
 
 
@@ -26,6 +28,11 @@ type alias DeveloperFeedback =
     , comments : String
     , rating : Int
     }
+
+
+type Form
+    = StepTwoForm DeveloperFeedbackForm
+    | StepOneorm CompanyInformationForm
 
 
 type alias DeveloperFeedbackForm =
@@ -60,9 +67,10 @@ type alias FormModel =
 
 type Msg
     = FetchCompanyDetails (Result Http.Error CompanyInformation)
-    | SendCompanyDetails CompanyInformation
+    | SaveForm Form
+    | SendCompanyDetails (Result Http.Error ())
     | FetchDevelopersList (Result Http.Error (List Developer))
-    | SendDevelopersFeedbackForm FormModel
+    | SendDevelopersFeedbackForm DeveloperFeedbackForm
 
 
 
@@ -142,6 +150,20 @@ fetchDevelopersListData clientName =
         }
 
 
+sendCompanyData : CompanyInformationForm -> Cmd Msg
+sendCompanyData form =
+    Http.post
+        { body =
+            Http.jsonBody <|
+                Json.Encode.object
+                    [ ( "location", Json.Encode.string form.location )
+                    , ( "supervisor", Json.Encode.string form.supervisor )
+                    ]
+        , expect = Http.expectWhatever SendCompanyDetails
+        , url = "http://localhost:8001/" ++ form.name
+        }
+
+
 
 -- Update
 
@@ -165,10 +187,13 @@ update msg model =
                 Err _ ->
                     ( Failure, Cmd.none )
 
-        SendCompanyDetails form ->
-            ( model, Cmd.none )
+        SendCompanyDetails formModel ->
+            ( Loading, Cmd.none )
 
         SendDevelopersFeedbackForm form ->
+            ( model, Cmd.none )
+
+        SaveForm form ->
             ( model, Cmd.none )
 
 
