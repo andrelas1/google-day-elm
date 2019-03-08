@@ -2,8 +2,7 @@
   "rabobank": {
     "name": "Rabobank",
     "location": "Utrecht",
-    "project": "Cool Project",
-    "department": "Platform"
+    "developers": ["John", "Marie", "Julie", "Mario"]
   },
   "developers": [
     {

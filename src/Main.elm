@@ -5,32 +5,47 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onSubmit)
 import Http
-import Json.Decode exposing (Decoder, field, map4, string)
+import Json.Decode exposing (Decoder, field, list, map2, string)
 
 
 
 -- Model
 
 
-type RemoteData
-    = CompanyData CompanyModel
-    | DevelopersList DevelopersListModel
+type alias Developer =
+    String
+
+
+type alias CompanyInformation =
+    { name : String
+    , location : String
+    }
+
+
+type alias DeveloperFeedback =
+    { name : Developer
+    , comments : String
+    , rating : Int
+    }
+
+
+type alias DeveloperFeedbackForm =
+    List DeveloperFeedback
+
+
+type alias CompanyInformationForm =
+    { name : String
+    , location : String
+    , supervisor : String
+    }
 
 
 type Model
     = Failure
     | Loading
-    | StepOne CompanyModel
-    | StepTwo DevelopersListModel
+    | StepOne CompanyInformation
+    | StepTwo (List Developer)
     | ThankYou
-
-
-type alias CompanyModel =
-    { manager : String
-    , location : String
-    , department : String
-    , project : String
-    }
 
 
 type alias DevelopersListModel =
@@ -45,9 +60,9 @@ type alias FormModel =
 
 
 type Msg
-    = FetchCompanyDetails (Result Http.Error CompanyModel)
-    | SendCompanyDetails CompanyModel
-    | FetchDevelopersList (Result Http.Error DevelopersListModel)
+    = FetchCompanyDetails (Result Http.Error CompanyInformation)
+    | SendCompanyDetails CompanyInformation
+    | FetchDevelopersList (Result Http.Error (List Developer))
     | SendDevelopersFeedbackForm FormModel
 
 
@@ -120,8 +135,8 @@ view model =
             div [] [ h1 [] [ text "OBRIGADO" ] ]
 
 
-users : List String -> Html msg
-users list =
+developersListView : List String -> Html msg
+developersListView list =
     list
         |> List.map (\user -> li [] [ text user ])
         |> ul []
@@ -143,20 +158,32 @@ init _ =
 
 
 fetchCompanyData : String -> Cmd Msg
-fetchCompanyData companyName =
+fetchCompanyData clientName =
     Http.get
-        { url = "http://localhost:8001/" ++ companyName
+        { url =
+            "http://localhost:8001/" ++ clientName
         , expect = Http.expectJson FetchCompanyDetails companyDecoder
         }
 
 
-companyDecoder : Decoder CompanyModel
+companyDecoder : Decoder CompanyInformation
 companyDecoder =
-    map4 CompanyModel
+    map2 CompanyInformation
         (field "name" string)
         (field "location" string)
-        (field "department" string)
-        (field "project" string)
+
+
+developerListDecoder : Decoder (List Developer)
+developerListDecoder =
+    field "developers" <| list string
+
+
+fetchDevelopersListData : String -> Cmd Msg
+fetchDevelopersListData clientName =
+    Http.get
+        { url = "http//localhost:8001/" ++ clientName ++ "/developers"
+        , expect = Http.expectJson FetchDevelopersList developerListDecoder
+        }
 
 
 
