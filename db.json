@@ -1,8 +1,12 @@
 {
+  "testing": {
+    "location": "utrecht",
+    "supervisor": "supervisor",
+    "name": "Rabobank"
+  },
   "rabobank": {
     "name": "Rabobank",
-    "location": "Utrecht",
-    "developers": ["John", "Marie", "Julie", "Mario"]
+    "location": "Utrecht"
   },
   "developers": [
     {

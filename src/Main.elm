@@ -3,7 +3,7 @@ module Main exposing (Model, Msg(..), init, main, update, view)
 import Browser
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onSubmit)
+import Html.Events exposing (onInput, onSubmit)
 import Http
 import Json.Decode exposing (Decoder, field, list, map2, string)
 import Json.Encode
@@ -49,7 +49,7 @@ type alias CompanyInformationForm =
 type Model
     = Failure
     | Loading
-    | StepOne CompanyInformation
+    | StepOne CompanyInformationForm
     | StepTwo (List Developer)
     | ThankYou
 
@@ -67,10 +67,12 @@ type alias FormModel =
 
 type Msg
     = FetchCompanyDetails (Result Http.Error CompanyInformation)
-    | SaveForm Form
     | SendCompanyDetails (Result Http.Error ())
     | FetchDevelopersList (Result Http.Error (List Developer))
     | SendDevelopersFeedbackForm DeveloperFeedbackForm
+    | SupervisorNameChange String
+    | LocationNameChange String
+    | SubmitForm
 
 
 lietest fields =
@@ -104,42 +106,59 @@ view model =
                 ]
 
         StepOne companyData ->
-            div [ class "container" ]
-                [ div [ class "row card-panel" ]
-                    [ Html.form [ class "col s12" ]
-                        [ h2 []
-                            [ text "Company Name" ]
-                        , div [ class "row" ]
-                            [ div [ class "input-field col s12" ]
-                                [ input [ class "validate", id "manager_name", type_ "text" ]
-                                    []
-                                , label [ for "manager_name" ]
-                                    [ text "Manager Name" ]
-                                ]
-                            ]
-                        , div [ class "row" ]
-                            [ div [ class "input-field col s12" ]
-                                [ input [ class "validate", id "location", type_ "text" ]
-                                    []
-                                , label [ for "location" ]
-                                    [ text "Location" ]
-                                ]
-                            ]
-                        , button
-                            [ class "btn waves-effect waves-light", name "action", type_ "submit" ]
-                            [ text "Submit    "
-                            , i [ class "material-icons right" ]
-                                [ text "send" ]
-                            ]
-                        ]
-                    ]
-                ]
+            stepOneView companyData
 
         StepTwo developersList ->
             div [] [ p [] [ text "developers list" ] ]
 
         ThankYou ->
             div [] [ h1 [] [ text "OBRIGADO" ] ]
+
+
+stepOneView : CompanyInformationForm -> Html Msg
+stepOneView model =
+    div
+        [ class "container" ]
+        [ div
+            [ class "row card-panel" ]
+            [ Html.form
+                [ class "col s12", onSubmit SubmitForm ]
+                [ h2
+                    []
+                    [ text model.name ]
+                , div
+                    [ class "row" ]
+                    [ div
+                        [ class "input-field col s12" ]
+                        [ input [ class "validate", id "manager_name", type_ "text", onInput SupervisorNameChange ]
+                            []
+                        , label
+                            [ for "manager_name" ]
+                            [ text "Supervisor" ]
+                        ]
+                    ]
+                , div
+                    [ class "row" ]
+                    [ div
+                        [ class "input-field col s12" ]
+                        [ input
+                            [ class "validate", id "location", type_ "text", onInput LocationNameChange ]
+                            []
+                        , label
+                            [ for "location" ]
+                            [ text "Location" ]
+                        ]
+                    ]
+                , button
+                    [ class "btn waves-effect waves-light", name "action", type_ "submit" ]
+                    [ text "Submit    "
+                    , i
+                        [ class "material-icons right" ]
+                        [ text "send" ]
+                    ]
+                ]
+            ]
+        ]
 
 
 developersListView : List String -> Html msg
@@ -201,9 +220,10 @@ sendCompanyData form =
                 Json.Encode.object
                     [ ( "location", Json.Encode.string form.location )
                     , ( "supervisor", Json.Encode.string form.supervisor )
+                    , ( "name", Json.Encode.string form.name )
                     ]
         , expect = Http.expectWhatever SendCompanyDetails
-        , url = "http://localhost:8001/" ++ form.name
+        , url = "http://localhost:8001/" ++ "testing"
         }
 
 
@@ -217,7 +237,7 @@ update msg model =
         FetchCompanyDetails result ->
             case result of
                 Ok data ->
-                    ( StepOne data, Cmd.none )
+                    ( StepOne { name = data.name, location = data.location, supervisor = "Supervisor" }, Cmd.none )
 
                 Err _ ->
                     ( Failure, Cmd.none )
@@ -236,8 +256,44 @@ update msg model =
         SendDevelopersFeedbackForm form ->
             ( model, Cmd.none )
 
-        SaveForm form ->
-            ( model, Cmd.none )
+        SupervisorNameChange inputValue ->
+            case model of
+                StepOne form ->
+                    let
+                        x =
+                            Debug.log "Input Supervisor" inputValue
+                    in
+                    ( StepOne { form | supervisor = inputValue }, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        LocationNameChange inputValue ->
+            case model of
+                StepOne form ->
+                    let
+                        x =
+                            Debug.log "Input Location" inputValue
+                    in
+                    ( StepOne { form | location = inputValue }, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        SubmitForm ->
+            case model of
+                StepOne form ->
+                    let
+                        a =
+                            Debug.log "SUBMITTTT" form
+                    in
+                    ( model, sendCompanyData form )
+
+                StepTwo form ->
+                    ( model, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
