@@ -251,7 +251,7 @@ update msg model =
                     ( Failure, Cmd.none )
 
         SendCompanyDetails formModel ->
-            ( Loading, Cmd.none )
+            ( StepTwo [ "John", "Lucia" ], Cmd.none )
 
         SendDevelopersFeedbackForm form ->
             ( model, Cmd.none )
