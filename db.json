@@ -8,22 +8,10 @@
     "name": "Rabobank",
     "location": "Utrecht"
   },
-  "developers": [
-    {
-      "name": "John",
-      "rating": 0
-    },
-    {
-      "name": "Marie",
-      "rating": 0
-    },
-    {
-      "name": "Julie",
-      "rating": 0
-    },
-    {
-      "name": "Mario",
-      "rating": 0
-    }
-  ]
+  "developers": {
+    "developers": [
+      "John",
+      "Marie"
+    ]
+  }
 }

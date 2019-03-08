@@ -95,15 +95,7 @@ view model =
             stepOneView companyData
 
         StepTwo developersList ->
-            div
-                []
-                [ h2
-                    []
-                    [ text "Developer John Rating" ]
-                , input
-                    [ type_ "number", onInput (DeveloperRatingChange "John") ]
-                    []
-                ]
+            developersListView developersList
 
         ThankYou ->
             div [] [ h1 [] [ text "OBRIGADO" ] ]
@@ -233,7 +225,7 @@ developerListDecoder =
 fetchDevelopersListData : String -> Cmd Msg
 fetchDevelopersListData clientName =
     Http.get
-        { url = "http//localhost:8001/" ++ clientName ++ "/developers"
+        { url = "http://localhost:8001/developers"
         , expect = Http.expectJson FetchDevelopersList developerListDecoder
         }
 
@@ -271,13 +263,13 @@ update msg model =
         FetchDevelopersList result ->
             case result of
                 Ok data ->
-                    ( StepTwo [], Cmd.none )
+                    ( StepTwo (developersListToDeveloperFeedbackForm data), Cmd.none )
 
                 Err _ ->
                     ( Failure, Cmd.none )
 
         SendCompanyDetails formModel ->
-            ( StepTwo [], Cmd.none )
+            ( StepTwo [], fetchDevelopersListData "rabobank" )
 
         SendDevelopersFeedbackForm form ->
             ( model, Cmd.none )
