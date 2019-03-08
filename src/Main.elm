@@ -155,11 +155,43 @@ stepOneView model =
         ]
 
 
-developersListView : List String -> Html msg
-developersListView list =
-    list
-        |> List.map (\user -> li [] [ text user ])
-        |> ul []
+renderDeveloper : DeveloperFeedback -> Html Msg
+renderDeveloper model =
+    div [ class "row" ]
+        [ div [ class "row" ]
+            [ h2 []
+                [ text model.name ]
+            ]
+        , div [ class "row" ]
+            [ div [ class "input-field col s6" ]
+                [ input [ class "validate", id "rating", type_ "number", value <| String.fromInt model.rating ]
+                    []
+                , label [ for "rating" ]
+                    [ text "Rating" ]
+                ]
+            , div [ class "input-field col s6" ]
+                [ textarea [ class "validate", id "comments", name "comments", value model.comments ]
+                    []
+                , label [ for "comments" ]
+                    [ text "Comments" ]
+                ]
+            ]
+        ]
+
+
+developerToDeveloperFeedback : String -> DeveloperFeedback
+developerToDeveloperFeedback model =
+    { name = model, comments = "", rating = 0 }
+
+
+developersListToDeveloperFeedbackForm : List String -> DeveloperFeedbackForm
+developersListToDeveloperFeedbackForm model =
+    List.map developerToDeveloperFeedback model
+
+
+developersListView : DeveloperFeedbackForm -> Html Msg
+developersListView model =
+    div [ class "container" ] (List.map renderDeveloper model)
 
 
 
