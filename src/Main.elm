@@ -54,13 +54,6 @@ type Model
     | ThankYou
 
 
-type alias DevelopersListModel =
-    List
-        { name : String
-        , rating : Int
-        }
-
-
 type Msg
     = FetchCompanyDetails (Result Http.Error CompanyInformation)
     | SendCompanyDetails (Result Http.Error ())
@@ -68,11 +61,8 @@ type Msg
     | SendDevelopersFeedbackForm DeveloperFeedbackForm
     | SupervisorNameChange String
     | LocationNameChange String
+    | DeveloperRatingChange String String
     | SubmitForm
-
-
-lietest fields =
-    fields
 
 
 
@@ -105,7 +95,15 @@ view model =
             stepOneView companyData
 
         StepTwo developersList ->
-            div [] [ p [] [ text "developers list" ] ]
+            div
+                []
+                [ h2
+                    []
+                    [ text "Developer John Rating" ]
+                , input
+                    [ type_ "number", onInput (DeveloperRatingChange "John") ]
+                    []
+                ]
 
         ThankYou ->
             div [] [ h1 [] [ text "OBRIGADO" ] ]
@@ -126,7 +124,7 @@ stepOneView model =
                     [ class "row" ]
                     [ div
                         [ class "input-field col s12" ]
-                        [ input [ class "validate", id "manager_name", type_ "text", onInput SupervisorNameChange ]
+                        [ input [ name "manager", class "validate", id "manager_name", type_ "text", onInput SupervisorNameChange ]
                             []
                         , label
                             [ for "manager_name" ]
@@ -138,7 +136,7 @@ stepOneView model =
                     [ div
                         [ class "input-field col s12" ]
                         [ input
-                            [ class "validate", id "location", type_ "text", onInput LocationNameChange ]
+                            [ class "validate", name "location", id "location", type_ "text", onInput LocationNameChange ]
                             []
                         , label
                             [ for "location" ]
@@ -322,6 +320,35 @@ update msg model =
 
                 _ ->
                     ( model, Cmd.none )
+
+        DeveloperRatingChange name inputValue ->
+            let
+                x =
+                    Debug.log "DEVELOPER" (inputValue ++ name)
+            in
+            case model of
+                StepTwo form ->
+                    ( StepTwo <| updateDevelopersRating form name inputValue, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
+
+
+updateDevelopersRating : DeveloperFeedbackForm -> String -> String -> DeveloperFeedbackForm
+updateDevelopersRating list name rating =
+    List.map
+        (\developer ->
+            if developer.name == name then
+                { developer | rating = Maybe.withDefault 0 (String.toInt rating) }
+
+            else
+                developer
+        )
+        list
+
+
+
+-- Subscriptions
 
 
 subscriptions : Model -> Sub Msg
