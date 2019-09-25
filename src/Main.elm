@@ -58,7 +58,7 @@ type Msg
     = FetchCompanyDetails (Result Http.Error CompanyInformation)
     | SendCompanyDetails (Result Http.Error ())
     | FetchDevelopersList (Result Http.Error (List Developer))
-    | SendDevelopersFeedbackForm DeveloperFeedbackForm
+    | SendDevelopersFeedbackForm (Result Http.Error ())
     | SupervisorNameChange String
     | LocationNameChange String
     | DeveloperRatingChange String String
@@ -116,7 +116,8 @@ stepOneView model =
                     [ class "row" ]
                     [ div
                         [ class "input-field col s12" ]
-                        [ input [ name "manager", class "validate", id "manager_name", type_ "text", onInput SupervisorNameChange ]
+                        [ input
+                            [ name "manager", class "validate", id "manager_name", type_ "text", onInput SupervisorNameChange ]
                             []
                         , label
                             [ for "manager_name" ]
@@ -150,17 +151,24 @@ stepOneView model =
 renderDeveloper : DeveloperFeedback -> Html Msg
 renderDeveloper model =
     div [ class "row" ]
-        [ div [ class "row" ]
-            [ h2 []
+        [ div
+            [ class "row" ]
+            [ h2
+                []
                 [ text model.name ]
             ]
-        , div [ class "row" ]
-            [ div [ class "input-field col s12" ]
-                [ input [ class "validate", id "rating", type_ "number", value <| String.fromInt model.rating ]
+        , div
+            [ class "row" ]
+            [ div
+                [ class "input-field col s12" ]
+                [ input
+                    [ class "validate", id "rating", type_ "number", value <| String.fromInt model.rating ]
                     []
                 ]
-            , div [ class "input-field col s12" ]
-                [ textarea [ class "validate", id "comments", name "comments", value model.comments ]
+            , div
+                [ class "input-field col s12" ]
+                [ textarea
+                    [ class "validate", id "comments", name "comments", value model.comments ]
                     []
                 ]
             ]
@@ -179,7 +187,22 @@ developersListToDeveloperFeedbackForm model =
 
 developersListView : DeveloperFeedbackForm -> Html Msg
 developersListView model =
-    div [ class "container" ] (List.map renderDeveloper model)
+    div
+        [ class "container" ]
+        [ Html.form
+            [ onSubmit SubmitForm ]
+            [ div
+                []
+                (List.map renderDeveloper model)
+            , button
+                [ class "btn waves-effect waves-light", name "action", type_ "submit" ]
+                [ text "Submit    "
+                , i
+                    [ class "material-icons right" ]
+                    [ text "send" ]
+                ]
+            ]
+        ]
 
 
 
@@ -241,6 +264,33 @@ sendCompanyData form =
         }
 
 
+sendDevelopersFeedbackData : DeveloperFeedbackForm -> Cmd Msg
+sendDevelopersFeedbackData form =
+    let
+        x =
+            Debug.log "DEVELOPER FEEWDBACK" form
+    in
+    Http.post
+        { body =
+            Http.jsonBody <|
+                Json.Encode.object
+                    [ ( "developers"
+                      , Json.Encode.list
+                            (\developer ->
+                                Json.Encode.object
+                                    [ ( "name", Json.Encode.string developer.name )
+                                    , ( "comments", Json.Encode.string developer.comments )
+                                    , ( "rating", Json.Encode.int developer.rating )
+                                    ]
+                            )
+                            form
+                      )
+                    ]
+        , expect = Http.expectWhatever SendDevelopersFeedbackForm
+        , url = "http://localhost:8001/post-developers"
+        }
+
+
 
 -- Update
 
@@ -267,8 +317,13 @@ update msg model =
         SendCompanyDetails formModel ->
             ( StepTwo [], fetchDevelopersListData "rabobank" )
 
-        SendDevelopersFeedbackForm form ->
-            ( model, Cmd.none )
+        SendDevelopersFeedbackForm result ->
+            case result of
+                Ok data ->
+                    ( ThankYou, Cmd.none )
+
+                Err _ ->
+                    ( Failure, Cmd.none )
 
         SupervisorNameChange inputValue ->
             case model of
@@ -304,7 +359,7 @@ update msg model =
                     ( model, sendCompanyData form )
 
                 StepTwo form ->
-                    ( model, Cmd.none )
+                    ( model, sendDevelopersFeedbackData form )
 
                 _ ->
                     ( model, Cmd.none )

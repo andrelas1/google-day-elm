@@ -1,7 +1,7 @@
 {
   "testing": {
-    "location": "sdfsd",
-    "supervisor": "fsdfs",
+    "location": "dsadsadsa",
+    "supervisor": "sddasdsa",
     "name": "Rabobank"
   },
   "rabobank": {
@@ -13,5 +13,37 @@
       "John",
       "Marie"
     ]
-  }
+  },
+  "post-developers": [
+    {
+      "developers": [
+        {
+          "name": "John",
+          "comments": "",
+          "rating": 0
+        },
+        {
+          "name": "Marie",
+          "comments": "",
+          "rating": 0
+        }
+      ],
+      "id": 1
+    },
+    {
+      "developers": [
+        {
+          "name": "John",
+          "comments": "",
+          "rating": 0
+        },
+        {
+          "name": "Marie",
+          "comments": "",
+          "rating": 0
+        }
+      ],
+      "id": 2
+    }
+  ]
 }
